@@ -12,11 +12,14 @@ interface Props {
 export function JsonEditor({ label, hint, value, onChange, rows = 6 }: Props) {
   const [raw, setRaw] = useState(() => JSON.stringify(value, null, 2))
   const [error, setError] = useState<string | null>(null)
+  const [isFocused, setIsFocused] = useState(false)
 
-  // Sync outward prop changes only when not actively editing
+  // Sync when value changes (e.g., reload from localStorage) but not while editing or if has error
   useEffect(() => {
-    setRaw(JSON.stringify(value, null, 2))
-  }, []) // intentionally only on mount
+    if (!isFocused && !error) {
+      setRaw(JSON.stringify(value, null, 2))
+    }
+  }, [value, isFocused, error])
 
   function handleChange(text: string) {
     setRaw(text)
@@ -33,6 +36,15 @@ export function JsonEditor({ label, hint, value, onChange, rows = 6 }: Props) {
     }
   }
 
+  function handleBlur() {
+    setIsFocused(false)
+    // Auto-reset empty field to last valid value
+    if (raw.trim() === '') {
+      setRaw(JSON.stringify(value, null, 2))
+      setError(null)
+    }
+  }
+
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
@@ -43,6 +55,8 @@ export function JsonEditor({ label, hint, value, onChange, rows = 6 }: Props) {
         rows={rows}
         value={raw}
         onChange={e => handleChange(e.target.value)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={handleBlur}
         spellCheck={false}
         className={`w-full rounded-lg bg-gray-800 border px-3 py-2 text-sm font-mono resize-y focus:outline-none focus:ring-1 ${
           error

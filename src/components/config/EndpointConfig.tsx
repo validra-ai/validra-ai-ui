@@ -1,6 +1,6 @@
 import type { HttpMethod, TestRequest } from '../../types'
 
-const METHODS: HttpMethod[] = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+const METHODS: HttpMethod[] = ['POST', 'PUT', 'PATCH']
 
 interface Props {
   value: Pick<TestRequest, 'endpoint' | 'method'>

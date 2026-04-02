@@ -67,10 +67,11 @@ export interface SavedRun {
   response: GenerationResponse
 }
 
-export type SSEPhase = 'warming_up' | 'generating' | 'executing' | 'validating' | 'result' | 'done' | 'error'
+export type SSEPhase = 'warming_up' | 'generating' | 'executing' | 'validating' | 'result' | 'done' | 'cancelled' | 'error'
 
 export interface SSEEvent {
   phase: SSEPhase
+  run_id?: string
   progress?: number
   total?: number
   result?: TestResult

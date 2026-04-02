@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Play, History, AlertCircle, Loader2, ShieldCheck, Flame, Brain, Zap } from 'lucide-react'
 import type { ProgressState, Summary, TestResult } from './types'
 
@@ -89,13 +89,29 @@ const DEFAULT_REQUEST: TestRequest = {
   provider: 'ollama',
 }
 
+const REQUEST_STORAGE_KEY = 'validra_current_request'
+
 type Tab = 'run' | 'history'
 
 export default function App() {
-  const [req, setReq] = useState<TestRequest>(DEFAULT_REQUEST)
+  const [req, setReq] = useState<TestRequest>(() => {
+    try {
+      const raw = localStorage.getItem(REQUEST_STORAGE_KEY)
+      if (raw) {
+        return JSON.parse(raw) as TestRequest
+      }
+    } catch {
+      // ignore invalid stored data
+    }
+    return DEFAULT_REQUEST
+  })
   const [tab, setTab] = useState<Tab>('run')
-  const { loading, progress, streamedResults, response, error, run } = useTestRun()
+  const { loading, progress, streamedResults, response, error, run, cancel, runId, canceled } = useTestRun()
   const { history, addRun, removeRun, clearHistory } = useHistory()
+
+  useEffect(() => {
+    localStorage.setItem(REQUEST_STORAGE_KEY, JSON.stringify(req))
+  }, [req])
 
   function patch(partial: Partial<TestRequest>) {
     setReq(prev => ({ ...prev, ...partial }))
@@ -161,17 +177,24 @@ export default function App() {
               onChange={provider_config => patch({ provider_config })}
             />
 
-            <button
-              type="button"
-              onClick={handleRun}
-              disabled={!canRun}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-colors bg-sky-600 hover:bg-sky-500 disabled:bg-gray-800 disabled:text-gray-600 disabled:cursor-not-allowed"
-            >
-              {loading
-                ? <><Loader2 size={16} className="animate-spin" /> Running…</>
-                : <><Play size={16} /> Run Tests</>
-              }
-            </button>
+            {!loading ? (
+              <button
+                type="button"
+                onClick={handleRun}
+                disabled={!canRun}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-colors bg-sky-600 hover:bg-sky-500 disabled:bg-gray-800 disabled:text-gray-600 disabled:cursor-not-allowed"
+              >
+                <><Play size={16} /> Run Tests</>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={cancel}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-colors bg-red-600 hover:bg-red-500"
+              >
+                <><Loader2 size={16} className="animate-spin" /> Cancel Run</>
+              </button>
+            )}
           </div>
         </aside>
 

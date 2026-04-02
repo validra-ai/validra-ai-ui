@@ -1,6 +1,6 @@
 {
   "name": "@validra-ai/ui",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "UI for Validra — AI-powered API test generation and validation",
   "license": "MIT",
   "keywords": ["validra", "api-testing", "llm", "fuzz-testing", "penetration-testing"],

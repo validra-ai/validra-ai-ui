@@ -62,20 +62,6 @@ export function TestOptions({ value, onChange }: Props) {
         </div>
       </div>
 
-      {/* Provider */}
-      <div className="space-y-1.5">
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-400">LLM Provider</h3>
-        <select
-          value={value.provider}
-          onChange={e => onChange({ provider: e.target.value as Provider })}
-          className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500"
-        >
-          {PROVIDERS.map(p => (
-            <option key={p.value} value={p.value}>{p.label}</option>
-          ))}
-        </select>
-      </div>
-
       {/* Validate */}
       <div className="space-y-1.5">
         <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-400">Result Validation</h3>
@@ -95,6 +81,20 @@ export function TestOptions({ value, onChange }: Props) {
             <p className="text-xs text-gray-500">Use the selected LLM to assess each response</p>
           </div>
         </label>
+      </div>
+
+      {/* Provider */}
+      <div className="space-y-1.5">
+        <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-400">LLM Provider</h3>
+        <select
+          value={value.provider}
+          onChange={e => onChange({ provider: e.target.value as Provider })}
+          className="w-full rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500"
+        >
+          {PROVIDERS.map(p => (
+            <option key={p.value} value={p.value}>{p.label}</option>
+          ))}
+        </select>
       </div>
     </div>
   )

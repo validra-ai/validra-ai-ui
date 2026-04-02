@@ -1,4 +1,5 @@
 import { Plus, Trash2, HelpCircle, Wand2 } from 'lucide-react'
+import { useRef, useEffect } from 'react'
 
 interface Props {
   value: Record<string, string>
@@ -27,6 +28,15 @@ const EXAMPLES = [
 
 export function MetaEditor({ value, onChange, payload }: Props) {
   const entries = Object.entries(value)
+  const lastKeyInputRef = useRef<HTMLInputElement>(null)
+  const prevLengthRef = useRef(entries.length)
+
+  useEffect(() => {
+    if (entries.length > prevLengthRef.current && lastKeyInputRef.current) {
+      setTimeout(() => lastKeyInputRef.current?.focus(), 0)
+    }
+    prevLengthRef.current = entries.length
+  }, [entries.length])
 
   function update(idx: number, key: string, constraint: string) {
     const next = [...entries]
@@ -91,25 +101,29 @@ export function MetaEditor({ value, onChange, payload }: Props) {
         <p className="text-xs text-gray-600 italic">No meta — the LLM will infer constraints from the payload</p>
       )}
 
-      {entries.map(([k, v], idx) => (
-        <div key={idx} className="flex gap-2 items-center">
-          <input
-            placeholder="fieldName"
-            value={k}
-            onChange={e => update(idx, e.target.value, v)}
-            className="w-2/5 rounded-lg bg-gray-800 border border-gray-700 px-2 py-1.5 text-xs font-mono placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-sky-500"
-          />
-          <input
-            placeholder="required, alphanumeric, [3-20] chars"
-            value={v}
-            onChange={e => update(idx, k, e.target.value)}
-            className="flex-1 rounded-lg bg-gray-800 border border-gray-700 px-2 py-1.5 text-xs font-mono placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-sky-500"
-          />
-          <button type="button" onClick={() => remove(idx)} className="text-gray-600 hover:text-red-400">
-            <Trash2 size={14} />
-          </button>
-        </div>
-      ))}
+      {entries.map(([k, v], idx) => {
+        const isLast = idx === entries.length - 1
+        return (
+          <div key={idx} className="flex gap-2 items-center">
+            <input
+              ref={isLast ? lastKeyInputRef : null}
+              placeholder="fieldName"
+              value={k}
+              onChange={e => update(idx, e.target.value, v)}
+              className="w-2/5 rounded-lg bg-gray-800 border border-gray-700 px-2 py-1.5 text-xs font-mono placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            />
+            <input
+              placeholder="required, alphanumeric, [3-20] chars"
+              value={v}
+              onChange={e => update(idx, k, e.target.value)}
+              className="flex-1 rounded-lg bg-gray-800 border border-gray-700 px-2 py-1.5 text-xs font-mono placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            />
+            <button type="button" onClick={() => remove(idx)} className="text-gray-600 hover:text-red-400">
+              <Trash2 size={14} />
+            </button>
+          </div>
+        )
+      })}
     </div>
   )
 }

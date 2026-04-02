@@ -14,6 +14,10 @@ export default defineConfig({
         target: process.env.VALIDRA_API_URL || 'http://localhost:8000',
         changeOrigin: true,
       },
+      '/cancel': {
+        target: process.env.VALIDRA_API_URL || 'http://localhost:8000',
+        changeOrigin: true,
+      },
     },
   },
   build: {

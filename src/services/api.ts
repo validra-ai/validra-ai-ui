@@ -37,6 +37,17 @@ export async function* generateAndRunStream(req: TestRequest): AsyncGenerator<SS
   }
 }
 
+export async function cancelRun(runId: string): Promise<void> {
+  const response = await fetch(`${BASE_URL}/cancel/${encodeURIComponent(runId)}`, {
+    method: 'POST',
+  })
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}))
+    throw new Error((data as { detail?: string }).detail ?? `HTTP ${response.status}`)
+  }
+}
+
 export async function validateSingle(
   test: Record<string, unknown>,
   response: Record<string, unknown>,
