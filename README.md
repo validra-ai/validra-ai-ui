@@ -4,56 +4,74 @@ A React-based front-end for **Validra AI**, a tool that uses LLMs to automatical
 
 ---
 
-## Requirements
+## Prerequisites
 
-- Node.js 20+
-- A running [Validra AI backend](http://localhost:8000) (provides `/generateAndRun` and `/validate` endpoints)
-- (Optional) Docker & Docker Compose for containerised deployment
+- A running **Validra AI backend** reachable at a known URL (default: `http://localhost:8000`)
+- **Docker** (recommended) — or Node.js 20+ for local development
 
 ---
 
-## Getting started
+## Run with Docker (recommended)
 
-### 1. Configure environment
+### 1. Set the backend URL
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and point `VITE_API_URL` to your backend:
+Edit `.env`:
 
 ```env
 VITE_API_URL=http://localhost:8000
 ```
 
-### 2. Run in development
-
-```bash
-npm install
-npm run dev
-```
-
-The app is served at `http://localhost:5173` (Vite default).
-
-### 3. Build for production
-
-```bash
-npm run build       # outputs to dist/
-npm run preview     # preview the production build locally
-```
-
-### 4. Run with Docker Compose
+### 2. Start the container
 
 ```bash
 docker compose up --build
 ```
 
-The app is served at `http://localhost:3000` via nginx.
+The UI is served at **http://localhost:3000**.
 
-To override the backend URL at runtime:
+To pass the backend URL inline without editing `.env`:
 
 ```bash
-VITE_API_URL=http://my-api-host:8000 docker compose up --build
+VITE_API_URL=http://my-backend-host:8000 docker compose up --build
+```
+
+> **Note:** `VITE_API_URL` is baked into the static build at image build time. Changing it after the image is built requires a rebuild (`--build`).
+
+---
+
+## Run locally (optional)
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set `VITE_API_URL` to your backend URL.
+
+### 3. Start the dev server
+
+```bash
+npm run dev
+```
+
+The app is served at **http://localhost:5173** (Vite default).
+
+### 4. Build for production
+
+```bash
+npm run build       # outputs to dist/
+npm run preview     # preview the production build locally
 ```
 
 ---
@@ -89,7 +107,7 @@ VITE_API_URL=http://my-api-host:8000 docker compose up --build
 | **OpenAI** | `gpt-4o` | Requires an API key |
 | **Anthropic** | `claude-sonnet-4-6` | Requires an API key |
 
-Enable **LLM Validate** to have the selected provider score each test result (PASS / WARN / FAIL) and provide a confidence score and reasoning.
+Enable **Validate test results with LLM** to have the selected provider score each test result (PASS / WARN / FAIL) with a confidence score and reasoning.
 
 ### Results panel (right area)
 
@@ -113,39 +131,11 @@ src/
     results/     # Right panel: summary bar, test cards, results panel
     history/     # History tab
   hooks/
-    useTestRun.ts   # Calls /generateAndRun, manages loading/error state
+    useTestRun.ts   # Calls the backend, manages loading/error state
     useHistory.ts   # localStorage persistence for past runs
   services/
-    api.ts          # Axios client — generateAndRun() and validateSingle()
+    api.ts          # Axios client
   types/
     index.ts        # Shared TypeScript types
   App.tsx           # Root layout and tab routing
 ```
-
----
-
-## API contract (backend)
-
-### `POST /generateAndRun`
-
-Request body: `TestRequest`
-
-```json
-{
-  "endpoint": "https://api.example.com/users",
-  "method": "POST",
-  "headers": { "Content-Type": "application/json" },
-  "payload": { "username": "john", "age": 25 },
-  "payload_meta": { "username": "required, alphanumeric, [3-20] chars", "age": "required, numeric, [0-120]" },
-  "test_type": "FUZZ",
-  "max_cases": 10,
-  "validate": true,
-  "provider": "ollama"
-}
-```
-
-Response: `GenerationResponse` — `{ tests: TestResult[], summary: Summary }`
-
-### `POST /validate`
-
-Validates a single test result and returns a `ValidationResult` with `dstatus` (PASS/FAIL/WARN), `reason`, and `confidence`.
