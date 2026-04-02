@@ -6,10 +6,30 @@ const BASE_URL = ''
 const client = axios.create({ baseURL: BASE_URL, timeout: 300_000 })
 
 export async function* generateAndRunStream(req: TestRequest): AsyncGenerator<SSEEvent> {
+  // Destructure only the fields the backend expects. This drops any stale keys
+  // that may have accumulated in localStorage from older versions of the app
+  // (e.g. `validate` was renamed to `run_validation`).
+  const { endpoint, method, headers, payload, payload_meta, test_type,
+          max_cases, run_validation, provider, provider_config } = req
+
+  const VALID_METHODS = ['POST', 'PUT', 'PATCH'] as const
+  const body = {
+    endpoint,
+    method: VALID_METHODS.includes(method as typeof VALID_METHODS[number]) ? method : 'POST',
+    headers,
+    payload,
+    payload_meta,
+    test_type,
+    max_cases,
+    run_validation,
+    provider,
+    provider_config,
+  }
+
   const response = await fetch(`${BASE_URL}/generateAndRun`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(req),
+    body: JSON.stringify(body),
   })
 
   if (!response.ok || !response.body) {

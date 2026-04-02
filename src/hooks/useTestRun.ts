@@ -57,11 +57,6 @@ export function useTestRun() {
             ...prev,
             progress: { phase: 'executing', current: event.progress!, total: event.total!, completed: completedCount },
           }))
-        } else if (event.phase === 'validating') {
-          setState((prev: RunState) => ({
-            ...prev,
-            progress: { phase: 'validating', current: event.progress!, total: event.total!, completed: completedCount },
-          }))
         } else if (event.phase === 'result') {
           completedCount++
           accumulated.push(event.result!)

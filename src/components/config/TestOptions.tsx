@@ -53,7 +53,7 @@ export function TestOptions({ value, onChange }: Props) {
           min={3}
           max={100}
           step={1}
-          value={value.max_cases}
+          value={value.max_cases ?? 10}
           onChange={e => onChange({ max_cases: parseInt(e.target.value) })}
           className="w-full accent-sky-500"
         />
@@ -66,13 +66,13 @@ export function TestOptions({ value, onChange }: Props) {
       <div className="space-y-1.5">
         <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-400">Result Validation</h3>
         <label className={`flex items-center gap-3 rounded-lg border px-4 py-3 cursor-pointer select-none transition-colors ${
-          value.run_validation
+          (value.run_validation ?? true)
             ? 'border-sky-500 bg-sky-950 text-sky-300'
             : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-500'
         }`}>
           <input
             type="checkbox"
-            checked={value.run_validation}
+            checked={value.run_validation ?? true}
             onChange={e => onChange({ run_validation: e.target.checked })}
             className="w-4 h-4 rounded accent-sky-500 shrink-0"
           />

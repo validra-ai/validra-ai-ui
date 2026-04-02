@@ -34,27 +34,25 @@ function RunProgress({ progress }: { progress: ProgressState | null }) {
     )
   }
 
-  // executing or validating — show progress bar
-  const pct = progress.total > 0 ? (progress.completed / progress.total) * 100 : 0
-  const isValidating = progress.phase === 'validating'
+  // executing — show progress bar
+  // Use `current` (not `completed`) because results arrive only after all
+  // parallel validations finish; `current` advances with each executing event.
+  const pct = progress.total > 0 ? (progress.current / progress.total) * 100 : 0
 
   return (
     <div className="px-4 py-3 rounded-xl border border-gray-800 bg-gray-900 space-y-2">
       <div className="flex items-center justify-between text-sm">
-        <span className={`flex items-center gap-2 ${isValidating ? 'text-violet-400' : 'text-sky-400'}`}>
-          {isValidating
-            ? <ShieldCheck size={14} className="animate-pulse" />
-            : <Zap size={14} className="animate-pulse" />
-          }
-          {isValidating ? 'Validating' : 'Executing'} test {progress.current} of {progress.total}…
+        <span className="flex items-center gap-2 text-sky-400">
+          <Zap size={14} className="animate-pulse" />
+          Executing test {progress.current} of {progress.total}…
         </span>
         <span className="text-gray-600 text-xs tabular-nums">
-          {progress.completed}/{progress.total} done
+          {progress.current}/{progress.total}
         </span>
       </div>
       <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all duration-500 ${isValidating ? 'bg-violet-500' : 'bg-sky-500'}`}
+          className="h-full rounded-full transition-all duration-500 bg-sky-500"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -98,7 +96,15 @@ export default function App() {
     try {
       const raw = localStorage.getItem(REQUEST_STORAGE_KEY)
       if (raw) {
-        return JSON.parse(raw) as TestRequest
+        const stored = JSON.parse(raw)
+        // Merge with DEFAULT_REQUEST so that: (a) unknown stale keys are dropped,
+        // (b) any newly added fields get a sensible default.
+        return {
+          ...DEFAULT_REQUEST,
+          ...Object.fromEntries(
+            Object.keys(DEFAULT_REQUEST).map(k => [k, stored[k] ?? DEFAULT_REQUEST[k as keyof TestRequest]])
+          ),
+        } as TestRequest
       }
     } catch {
       // ignore invalid stored data
@@ -114,7 +120,16 @@ export default function App() {
   }, [req])
 
   function patch(partial: Partial<TestRequest>) {
-    setReq(prev => ({ ...prev, ...partial }))
+    setReq(prev => {
+      const next = { ...prev, ...partial }
+      // Provider-specific config fields (e.g. Ollama's `url`) are invalid on
+      // other providers whose configs use `extra = "forbid"`. Clear the override
+      // whenever the provider itself changes to avoid 422 errors.
+      if (partial.provider && partial.provider !== prev.provider) {
+        next.provider_config = undefined
+      }
+      return next
+    })
   }
 
   async function handleRun() {

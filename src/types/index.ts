@@ -67,7 +67,7 @@ export interface SavedRun {
   response: GenerationResponse
 }
 
-export type SSEPhase = 'warming_up' | 'generating' | 'executing' | 'validating' | 'result' | 'done' | 'cancelled' | 'error'
+export type SSEPhase = 'warming_up' | 'generating' | 'executing' | 'result' | 'done' | 'cancelled' | 'error'
 
 export interface SSEEvent {
   phase: SSEPhase
@@ -80,7 +80,7 @@ export interface SSEEvent {
 }
 
 export interface ProgressState {
-  phase: 'warming_up' | 'generating' | 'executing' | 'validating'
+  phase: 'warming_up' | 'generating' | 'executing'
   current: number    // which test is being worked on (1-based)
   total: number      // total number of tests
   completed: number  // how many test results have been received
