@@ -69,7 +69,7 @@ export function TestCard({ result }: Props) {
             </Section>
 
             {result.validation && (
-              <Section title="Validation">
+              <Section title="LLM Validation">
                 <div className="flex items-start gap-3">
                   <StatusBadge status={result.validation.dstatus} />
                   <div className="flex-1 space-y-1">
