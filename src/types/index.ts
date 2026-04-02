@@ -66,3 +66,21 @@ export interface SavedRun {
   request: TestRequest
   response: GenerationResponse
 }
+
+export type SSEPhase = 'warming_up' | 'generating' | 'executing' | 'validating' | 'result' | 'done' | 'error'
+
+export interface SSEEvent {
+  phase: SSEPhase
+  progress?: number
+  total?: number
+  result?: TestResult
+  summary?: Summary
+  message?: string
+}
+
+export interface ProgressState {
+  phase: 'warming_up' | 'generating' | 'executing' | 'validating'
+  current: number    // which test is being worked on (1-based)
+  total: number      // total number of tests
+  completed: number  // how many test results have been received
+}

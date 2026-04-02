@@ -1,5 +1,66 @@
 import { useState } from 'react'
-import { Play, History, AlertCircle, Loader2, ShieldCheck } from 'lucide-react'
+import { Play, History, AlertCircle, Loader2, ShieldCheck, Flame, Brain, Zap } from 'lucide-react'
+import type { ProgressState, Summary, TestResult } from './types'
+
+function RunProgress({ progress }: { progress: ProgressState | null }) {
+  if (!progress) {
+    return (
+      <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-gray-800 bg-gray-900 text-sm text-gray-400">
+        <Loader2 size={16} className="animate-spin text-sky-500 shrink-0" />
+        Starting…
+      </div>
+    )
+  }
+
+  if (progress.phase === 'warming_up') {
+    return (
+      <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-amber-900/40 bg-amber-950/20 text-sm text-amber-400">
+        <span className="flex gap-0.5">
+          <Flame size={16} className="animate-bounce" style={{ animationDelay: '0ms' }} />
+          <Flame size={14} className="animate-bounce text-amber-500/60" style={{ animationDelay: '120ms' }} />
+          <Zap size={13} className="animate-bounce text-amber-300" style={{ animationDelay: '60ms' }} />
+        </span>
+        Warming up engines…
+      </div>
+    )
+  }
+
+  if (progress.phase === 'generating') {
+    return (
+      <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-sky-900/40 bg-sky-950/20 text-sm text-sky-400">
+        <Brain size={16} className="animate-pulse shrink-0" />
+        Generating test cases…
+      </div>
+    )
+  }
+
+  // executing or validating — show progress bar
+  const pct = progress.total > 0 ? (progress.completed / progress.total) * 100 : 0
+  const isValidating = progress.phase === 'validating'
+
+  return (
+    <div className="px-4 py-3 rounded-xl border border-gray-800 bg-gray-900 space-y-2">
+      <div className="flex items-center justify-between text-sm">
+        <span className={`flex items-center gap-2 ${isValidating ? 'text-violet-400' : 'text-sky-400'}`}>
+          {isValidating
+            ? <ShieldCheck size={14} className="animate-pulse" />
+            : <Zap size={14} className="animate-pulse" />
+          }
+          {isValidating ? 'Validating' : 'Executing'} test {progress.current} of {progress.total}…
+        </span>
+        <span className="text-gray-600 text-xs tabular-nums">
+          {progress.completed}/{progress.total} done
+        </span>
+      </div>
+      <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${isValidating ? 'bg-violet-500' : 'bg-sky-500'}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  )
+}
 import { EndpointConfig } from './components/config/EndpointConfig'
 import { HeadersEditor } from './components/config/HeadersEditor'
 import { JsonEditor } from './components/config/JsonEditor'
@@ -33,7 +94,7 @@ type Tab = 'run' | 'history'
 export default function App() {
   const [req, setReq] = useState<TestRequest>(DEFAULT_REQUEST)
   const [tab, setTab] = useState<Tab>('run')
-  const { loading, response, error, run } = useTestRun()
+  const { loading, progress, streamedResults, response, error, run } = useTestRun()
   const { history, addRun, removeRun, clearHistory } = useHistory()
 
   function patch(partial: Partial<TestRequest>) {
@@ -61,7 +122,7 @@ export default function App() {
 
         <div className="ml-auto flex items-center gap-2">
           <TabBtn active={tab === 'run'} onClick={() => setTab('run')}>
-            <Play size={13} /> Run
+            <Play size={13} /> Execution
           </TabBtn>
           <TabBtn active={tab === 'history'} onClick={() => setTab('history')}>
             <History size={13} />
@@ -128,9 +189,8 @@ export default function App() {
           {tab === 'run' && (
             <>
               {loading && (
-                <div className="flex flex-col items-center justify-center h-64 gap-4 text-gray-500">
-                  <Loader2 size={36} className="animate-spin text-sky-500" />
-                  <p className="text-sm">Generating and running tests…</p>
+                <div className="mb-5">
+                  <RunProgress progress={progress} />
                 </div>
               )}
 
@@ -144,8 +204,10 @@ export default function App() {
                 </div>
               )}
 
-              {response && !loading && (
-                <ResultsPanel response={response} />
+              {(response || (loading && streamedResults.length > 0)) && (
+                <ResultsPanel
+                  response={response ?? { tests: streamedResults, summary: buildRunningSummary(streamedResults) }}
+                />
               )}
 
               {!response && !loading && !error && (
@@ -157,6 +219,16 @@ export default function App() {
       </div>
     </div>
   )
+}
+
+function buildRunningSummary(results: TestResult[]): Summary {
+  const success = results.filter(r => r.success).length
+  return {
+    total: results.length,
+    success,
+    failed: results.length - success,
+    total_duration_ms: results.reduce((sum, r) => sum + r.duration_ms, 0),
+  }
 }
 
 function Divider() {
