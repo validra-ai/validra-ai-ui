@@ -13,33 +13,13 @@ A React-based front-end for **Validra AI**, a tool that uses LLMs to automatical
 
 ## Run with Docker (recommended)
 
-### 1. Set the backend URL
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env`:
-
-```env
-VITE_API_URL=http://localhost:8000
-```
-
-### 2. Start the container
+### Start the container
 
 ```bash
 docker compose up --build
 ```
 
 The UI is served at **http://localhost:3000**.
-
-To pass the backend URL inline without editing `.env`:
-
-```bash
-VITE_API_URL=http://my-backend-host:8000 docker compose up --build
-```
-
-> **Note:** `VITE_API_URL` is baked into the static build at image build time. Changing it after the image is built requires a rebuild (`--build`).
 
 ---
 
