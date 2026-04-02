@@ -2,6 +2,8 @@
 
 Visual interface for [Validra](https://github.com/validra-ai/validra-ai-core) — AI-powered API test generation and validation.
 
+![Validra UI](images/image.png)
+
 ---
 
 ## Requirements
