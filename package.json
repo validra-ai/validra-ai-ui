@@ -1,14 +1,32 @@
 {
-  "name": "validra-ai-ui",
-  "version": "1.0.0",
-  "description": "UI for Validra AI - API Test Generation & Validation",
-  "private": true,
+  "name": "@validra-ai/ui",
+  "version": "0.1.0",
+  "description": "UI for Validra — AI-powered API test generation and validation",
+  "license": "MIT",
+  "keywords": ["validra", "api-testing", "llm", "fuzz-testing", "penetration-testing"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/validra-ai/validra-ai-ui"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
+  "bin": {
+    "validra-ui": "./bin/serve.js"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "axios": "^1.7.2",
@@ -18,13 +36,17 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.0",
+    "@testing-library/react": "^16.0.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
+    "jsdom": "^24.0.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.2.2",
-    "vite": "^5.3.1"
+    "vite": "^5.3.1",
+    "vitest": "^1.6.0"
   }
 }

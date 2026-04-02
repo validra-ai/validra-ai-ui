@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { SSEEvent, TestRequest, ValidationResult } from '../types'
 
-const BASE_URL = import.meta.env.VITE_API_URL || ''
+const BASE_URL = ''
 
 const client = axios.create({ baseURL: BASE_URL, timeout: 300_000 })
 

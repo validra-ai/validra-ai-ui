@@ -7,11 +7,11 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/generateAndRun': {
-        target: process.env.VITE_API_URL || 'http://localhost:8000',
+        target: process.env.VALIDRA_API_URL || 'http://localhost:8000',
         changeOrigin: true,
       },
       '/validate': {
-        target: process.env.VITE_API_URL || 'http://localhost:8000',
+        target: process.env.VALIDRA_API_URL || 'http://localhost:8000',
         changeOrigin: true,
       },
     },
