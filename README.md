@@ -1,5 +1,7 @@
 # Validra AI — Test Studio UI
 
+![Validra AI](images/image.png)
+
 A React-based front-end for **Validra AI**, a tool that uses LLMs to automatically generate and execute API test cases (fuzz, auth, and penetration tests) against any HTTP endpoint.
 
 ---
