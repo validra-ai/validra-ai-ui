@@ -11,7 +11,7 @@ const mockRequest = (overrides: Partial<TestRequest> = {}): TestRequest => ({
   payload_meta: {},
   test_type: 'FUZZ',
   max_cases: 5,
-  validate: true,
+  run_validation: true,
   provider: 'ollama',
   ...overrides,
 })

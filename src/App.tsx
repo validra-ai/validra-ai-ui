@@ -85,7 +85,7 @@ const DEFAULT_REQUEST: TestRequest = {
   },
   test_type: 'FUZZ',
   max_cases: 10,
-  validate: true,
+  run_validation: true,
   provider: 'ollama',
 }
 
@@ -106,7 +106,7 @@ export default function App() {
     return DEFAULT_REQUEST
   })
   const [tab, setTab] = useState<Tab>('run')
-  const { loading, progress, streamedResults, response, error, run, cancel, runId, canceled } = useTestRun()
+  const { loading, progress, streamedResults, response, error, run, cancel } = useTestRun()
   const { history, addRun, removeRun, clearHistory } = useHistory()
 
   useEffect(() => {

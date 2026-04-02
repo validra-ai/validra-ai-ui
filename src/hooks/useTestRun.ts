@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { cancelRun, generateAndRunStream } from '../services/api'
-import type { GenerationResponse, ProgressState, SSEEvent, TestRequest, TestResult } from '../types'
+import type { GenerationResponse, ProgressState, TestRequest, TestResult } from '../types'
 
 export interface RunState {
   loading: boolean

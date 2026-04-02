@@ -19,7 +19,7 @@ export interface TestRequest {
   payload_meta: Record<string, string>
   test_type: TestType
   max_cases: number
-  validate: boolean
+  run_validation: boolean
   provider: Provider
   provider_config?: ProviderConfig
 }

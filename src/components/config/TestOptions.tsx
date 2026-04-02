@@ -13,7 +13,7 @@ const PROVIDERS: { value: Provider; label: string }[] = [
 ]
 
 interface Props {
-  value: Pick<TestRequest, 'test_type' | 'max_cases' | 'validate' | 'provider'>
+  value: Pick<TestRequest, 'test_type' | 'max_cases' | 'run_validation' | 'provider'>
   onChange: (v: Partial<TestRequest>) => void
 }
 
@@ -66,14 +66,14 @@ export function TestOptions({ value, onChange }: Props) {
       <div className="space-y-1.5">
         <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-400">Result Validation</h3>
         <label className={`flex items-center gap-3 rounded-lg border px-4 py-3 cursor-pointer select-none transition-colors ${
-          value.validate
+          value.run_validation
             ? 'border-sky-500 bg-sky-950 text-sky-300'
             : 'border-gray-700 bg-gray-800 text-gray-400 hover:border-gray-500'
         }`}>
           <input
             type="checkbox"
-            checked={value.validate}
-            onChange={e => onChange({ validate: e.target.checked })}
+            checked={value.run_validation}
+            onChange={e => onChange({ run_validation: e.target.checked })}
             className="w-4 h-4 rounded accent-sky-500 shrink-0"
           />
           <div>
